@@ -82,6 +82,19 @@
   .sw.cur{border-color:var(--yg);box-shadow:0 0 0 2px rgba(176,210,53,.4);}
   .sw i{display:block;}
   #swF .sw{width:80px;} .sw span{grid-column:1/-1;display:flex;align-items:center;justify-content:center;font-size:.72rem;}
+  /* install guide overlay (first launch in a browser; hidden once installed) */
+  #instOv{z-index:70;justify-content:flex-start;padding-top:max(22px,env(safe-area-inset-top));overflow:auto;}
+  #instCard{background:var(--mid);border:1px solid var(--line);border-top:4px solid var(--yg);border-radius:6px;padding:20px 18px;max-width:400px;width:100%;text-align:left;margin:auto 0;}
+  #instCard h1{font-size:22px;text-transform:uppercase;margin-bottom:4px;}
+  #instCard .sub{color:var(--mute);font-size:14px;line-height:1.45;margin-bottom:14px;}
+  .instTabs{display:flex;gap:8px;margin-bottom:12px;}
+  .instTabs button{flex:1;padding:10px 6px;border-radius:6px;border:1.5px solid var(--line);background:var(--dark);color:var(--lt2);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;}
+  .instTabs button.cur{background:var(--yg);color:var(--ink);border-color:var(--yg);}
+  .instPane{display:none;} .instPane.show{display:block;}
+  .instPane ol{padding-left:22px;color:var(--lt2);font-size:15px;line-height:1.5;}
+  .instPane li{margin-bottom:9px;} .instPane li b{color:var(--yg);}
+  .instNote{color:var(--mute);font-size:12.5px;line-height:1.45;margin-top:10px;border-left:3px solid var(--yg);padding-left:10px;}
+  #instRow{display:flex;gap:8px;margin-top:16px;} #instRow .act{flex:1;}
   /* version badge + toast (load-confirmation) */
   #ver{width:100%;text-align:center;color:var(--mute);font-size:.68rem;letter-spacing:.14em;margin-top:8px;cursor:pointer;user-select:none;}
   #ver b{color:var(--yg);font-weight:700;}
@@ -182,9 +195,28 @@
   <button class="act ghost" id="coachBtn">&#127891; Coach</button>
   <button class="act ghost" id="hintBtn" style="display:none;">&#128161; Hint</button>
   <button class="act ghost" id="backBtn" style="display:none;">&#8617; Takeback</button>
-  <button class="act" id="learnBtn">&#128214; Learn</button><button class="act ghost" id="themeBtn">&#127912; Theme</button>
-<div id="ver">YANKE CHESS &middot; <b>v1.2</b> &middot; Sep 3 2026</div></div>
+  <button class="act" id="learnBtn">&#128214; Learn</button><button class="act ghost" id="themeBtn">&#127912; Theme</button><button class="act ghost" id="instBtn">&#128241; Install</button>
+<div id="ver">YANKE CHESS &middot; <b>v1.3</b> &middot; Sep 3 2026</div></div>
 <div id="toast"></div>
+<div class="ov" id="instOv"><div id="instCard">
+  <h1>Put it on your phone</h1>
+  <div class="sub">Yanke Chess installs like an app: its own icon, full screen, works with no signal. Takes about 20 seconds.</div>
+  <div class="instTabs"><button id="instTabIos">iPhone / iPad</button><button id="instTabAnd">Android</button></div>
+  <div class="instPane" id="instIos"><ol>
+    <li>Open this page in <b>Safari</b> (if it opened inside another app, tap the &#8943; or compass icon and choose <b>Open in Safari</b>).</li>
+    <li>Tap the <b>Share</b> button &#9633;&#8593; at the bottom of the screen.</li>
+    <li>Scroll the list and tap <b>Add to Home Screen</b>.</li>
+    <li>Tap <b>Add</b> in the top corner. Yanke Chess is now on your home screen.</li>
+  </ol><div class="instNote">Safari is the sure route. Some other iPhone browsers hide or lack the Add to Home Screen option.</div></div>
+  <div class="instPane" id="instAnd"><ol>
+    <li>Open this page in <b>Chrome</b>.</li>
+    <li>Tap the <b>&#8942;</b> menu in the top corner.</li>
+    <li>Tap <b>Add to Home screen</b> (sometimes shown as <b>Install app</b>).</li>
+    <li>Tap <b>Install</b>. Yanke Chess is now on your home screen.</li>
+  </ol><button class="act" id="instNow" style="display:none;width:100%;margin-top:10px;">Install now</button>
+  <div class="instNote">Samsung Internet works too: tap the menu, then <b>Add page to</b>, then <b>Home screen</b>.</div></div>
+  <div id="instRow"><button class="act ghost" id="instLater">Not now</button><button class="act" id="instDone">Got it</button></div>
+</div></div>
 <div class="ov" id="learnOv"><h1>Learn chess</h1>
   <div style="max-height:56vh;overflow:auto;width:min(88vw,420px);" id="lsList"></div>
   <button class="act" id="lsClose">Close</button></div>
@@ -204,11 +236,32 @@
 /* guarded storage: in-memory fallback when localStorage is blocked (private mode, file://). Global for all scripts below. */
 const _ls=(function(){try{localStorage.setItem("__yc","1");localStorage.removeItem("__yc");return localStorage;}
   catch(e){const m={};return{getItem:k=>(k in m?m[k]:null),setItem:(k,v)=>{m[k]=String(v);},removeItem:k=>{delete m[k];}};}})();
-const YC_VERSION="v1.2 \u00b7 Sep 3 2026";
+const YC_VERSION="v1.3 \u00b7 Sep 3 2026";
 function ycToast(t){const el=document.getElementById("toast");if(!el)return;el.textContent=t;el.classList.add("show");
   clearTimeout(ycToast._t);ycToast._t=setTimeout(()=>el.classList.remove("show"),1800);}
 document.addEventListener("DOMContentLoaded",()=>{const v=document.getElementById("ver");if(v)v.addEventListener("click",()=>ycToast("Yanke Chess "+YC_VERSION));});
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});}
+/* ---- install guide ---- */
+const YC_STANDALONE=(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||window.navigator.standalone===true;
+const YC_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+let ycDeferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();ycDeferredPrompt=e;const b=document.getElementById("instNow");if(b)b.style.display="block";});
+function ycInstTab(ios){
+  document.getElementById("instIos").classList.toggle("show",ios);document.getElementById("instAnd").classList.toggle("show",!ios);
+  document.getElementById("instTabIos").classList.toggle("cur",ios);document.getElementById("instTabAnd").classList.toggle("cur",!ios);}
+function ycInstShow(){ycInstTab(YC_IOS);document.getElementById("instOv").classList.add("show");}
+function ycInstHide(){document.getElementById("instOv").classList.remove("show");}
+document.addEventListener("DOMContentLoaded",()=>{
+  document.getElementById("instTabIos").addEventListener("click",()=>ycInstTab(true));
+  document.getElementById("instTabAnd").addEventListener("click",()=>ycInstTab(false));
+  document.getElementById("instLater").addEventListener("click",ycInstHide);
+  document.getElementById("instDone").addEventListener("click",()=>{_ls.setItem("ks_install_seen","1");ycInstHide();});
+  document.getElementById("instBtn").addEventListener("click",ycInstShow);
+  document.getElementById("instNow").addEventListener("click",async()=>{if(!ycDeferredPrompt)return;ycDeferredPrompt.prompt();
+    try{await ycDeferredPrompt.userChoice;}catch(e){}ycDeferredPrompt=null;document.getElementById("instNow").style.display="none";});
+  if(YC_STANDALONE){document.getElementById("instBtn").style.display="none";}
+  else if(_ls.getItem("ks_install_seen")!=="1"){ycInstShow();}
+});
 </script>
 <script>
 /* ============================================================
