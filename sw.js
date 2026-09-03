@@ -2,7 +2,7 @@
    Online: every request hits the network; good responses are cached as they pass.
    Offline: falls back to the cache. Bump CACHE on EVERY deploy so installed phones update.
    CACHE name matches the version badge in index.html. */
-const CACHE="yankechess-v1.3-sep3-2026";
+const CACHE="yankechess-v1.4-sep3-2026";
 const CORE=["index.html","manifest.webmanifest","logo.png","icon192.png","icon512.png","iconmaskable512.png","favicon.png"];
 self.addEventListener("install",e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));

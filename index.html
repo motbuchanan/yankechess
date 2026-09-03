@@ -196,7 +196,7 @@
   <button class="act ghost" id="hintBtn" style="display:none;">&#128161; Hint</button>
   <button class="act ghost" id="backBtn" style="display:none;">&#8617; Takeback</button>
   <button class="act" id="learnBtn">&#128214; Learn</button><button class="act ghost" id="themeBtn">&#127912; Theme</button><button class="act ghost" id="instBtn">&#128241; Install</button>
-<div id="ver">YANKE CHESS &middot; <b>v1.3</b> &middot; Sep 3 2026</div></div>
+<div id="ver">YANKE CHESS &middot; <b>v1.4</b> &middot; Sep 3 2026</div></div>
 <div id="toast"></div>
 <div class="ov" id="instOv"><div id="instCard">
   <h1>Put it on your phone</h1>
@@ -236,7 +236,7 @@
 /* guarded storage: in-memory fallback when localStorage is blocked (private mode, file://). Global for all scripts below. */
 const _ls=(function(){try{localStorage.setItem("__yc","1");localStorage.removeItem("__yc");return localStorage;}
   catch(e){const m={};return{getItem:k=>(k in m?m[k]:null),setItem:(k,v)=>{m[k]=String(v);},removeItem:k=>{delete m[k];}};}})();
-const YC_VERSION="v1.3 \u00b7 Sep 3 2026";
+const YC_VERSION="v1.4 \u00b7 Sep 3 2026";
 function ycToast(t){const el=document.getElementById("toast");if(!el)return;el.textContent=t;el.classList.add("show");
   clearTimeout(ycToast._t);ycToast._t=setTimeout(()=>el.classList.remove("show"),1800);}
 document.addEventListener("DOMContentLoaded",()=>{const v=document.getElementById("ver");if(v)v.addEventListener("click",()=>ycToast("Yanke Chess "+YC_VERSION));});
