@@ -82,6 +82,27 @@
   .sw.cur{border-color:var(--yg);box-shadow:0 0 0 2px rgba(176,210,53,.4);}
   .sw i{display:block;}
   #swF .sw{width:80px;} .sw span{grid-column:1/-1;display:flex;align-items:center;justify-content:center;font-size:.72rem;}
+  /* ===== opening splash ===== */
+  #splash{position:fixed;inset:0;background:#000;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;
+    transition:opacity .55s ease;}
+  #splash.out{opacity:0;pointer-events:none;}
+  #splash.gone{display:none;}
+  #spMark{width:min(58vw,300px);aspect-ratio:1;position:relative;opacity:0;transform:scale(.55);
+    animation:spMarkIn 1.15s cubic-bezier(.2,.9,.25,1.05) .15s forwards;}
+  #spMark img{width:100%;height:100%;display:block;}
+  #spMark::after{content:"";position:absolute;inset:-14%;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(176,210,53,.45) 0%,rgba(176,210,53,0) 62%);opacity:0;animation:spGlow 1.6s ease-out .6s forwards;}
+  #spRule{width:0;height:3px;background:var(--yg);margin:22px 0 18px;animation:spRule .6s ease-out 1.05s forwards;}
+  #spLogo{width:min(78vw,400px);opacity:0;transform:translateY(14px);animation:spUp .6s ease-out 1.25s forwards;}
+  #spLogo img{width:100%;display:block;}
+  #spTag{margin-top:16px;font-family:"Arial Black",Arial,sans-serif;font-weight:900;color:var(--yg);font-size:clamp(13px,3.6vw,17px);letter-spacing:.22em;
+    text-transform:uppercase;opacity:0;animation:spUp .55s ease-out 1.75s forwards;}
+  #spSkip{position:absolute;bottom:max(22px,env(safe-area-inset-bottom));color:var(--mute);font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:0;animation:spUp .5s ease-out 1.2s forwards;}
+  @keyframes spMarkIn{to{opacity:1;transform:scale(1);}}
+  @keyframes spGlow{0%{opacity:0;}40%{opacity:1;}100%{opacity:.35;}}
+  @keyframes spRule{to{width:min(60vw,320px);}}
+  @keyframes spUp{to{opacity:1;transform:translateY(0);}}
+  @media (prefers-reduced-motion:reduce){#spMark,#spRule,#spLogo,#spTag,#spSkip{animation-duration:.01s;animation-delay:0s;}}
   /* install guide overlay (first launch in a browser; hidden once installed) */
   #instOv{z-index:70;justify-content:flex-start;padding-top:max(22px,env(safe-area-inset-top));overflow:auto;}
   #instCard{background:var(--mid);border:1px solid var(--line);border-top:4px solid var(--yg);border-radius:6px;padding:20px 18px;max-width:400px;width:100%;text-align:left;margin:auto 0;}
@@ -180,6 +201,7 @@
 .lsTier{color:var(--yg);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;margin:14px 0 4px;text-align:left}
 .lsSoon{color:var(--mute);font-size:.86rem;text-align:left;margin:2px 0 6px}
 </style></head><body>
+<div id="splash"><div id="spMark"><img src="mark.png" alt=""></div><div id="spRule"></div><div id="spLogo"><img src="logo.png" alt="Yanke Bionics"></div><div id="spTag">Accept No Limitations.</div><div id="spSkip">Tap to skip</div></div>
 <div id="barWrap"><div id="bar"><div id="title"><img src="logo.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span id="logoTxt">YANKE BIONICS</span></div><div id="turnWrap"><div id="dot"></div><div id="turnName"></div></div></div></div>
 <div class="tray" id="trayTop"></div>
 <div id="frame"><div id="board"></div></div>
@@ -196,7 +218,7 @@
   <button class="act ghost" id="hintBtn" style="display:none;">&#128161; Hint</button>
   <button class="act ghost" id="backBtn" style="display:none;">&#8617; Takeback</button>
   <button class="act" id="learnBtn">&#128214; Learn</button><button class="act ghost" id="themeBtn">&#127912; Theme</button><button class="act ghost" id="instBtn">&#128241; Install</button>
-<div id="ver">YANKE CHESS &middot; <b>v1.5</b> &middot; Sep 3 2026</div></div>
+<div id="ver">YANKE CHESS &middot; <b>v1.6</b> &middot; Sep 3 2026</div></div>
 <div id="toast"></div>
 <div class="ov" id="instOv"><div id="instCard">
   <h1>Put it on your phone</h1>
@@ -236,11 +258,17 @@
 /* guarded storage: in-memory fallback when localStorage is blocked (private mode, file://). Global for all scripts below. */
 const _ls=(function(){try{localStorage.setItem("__yc","1");localStorage.removeItem("__yc");return localStorage;}
   catch(e){const m={};return{getItem:k=>(k in m?m[k]:null),setItem:(k,v)=>{m[k]=String(v);},removeItem:k=>{delete m[k];}};}})();
-const YC_VERSION="v1.5 \u00b7 Sep 3 2026";
+const YC_VERSION="v1.6 \u00b7 Sep 3 2026";
 function ycToast(t){const el=document.getElementById("toast");if(!el)return;el.textContent=t;el.classList.add("show");
   clearTimeout(ycToast._t);ycToast._t=setTimeout(()=>el.classList.remove("show"),1800);}
 document.addEventListener("DOMContentLoaded",()=>{const v=document.getElementById("ver");if(v)v.addEventListener("click",()=>ycToast("Yanke Chess "+YC_VERSION));});
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});}
+/* ---- opening splash: ~2.9s, tap to skip, then fades to the game (start card / install guide sit underneath) ---- */
+(function(){const sp=document.getElementById("splash");if(!sp)return;let done=false;
+  function end(){if(done)return;done=true;sp.classList.add("out");setTimeout(()=>sp.classList.add("gone"),600);}
+  sp.addEventListener("click",end);
+  const RM=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  setTimeout(end,RM?900:2900);})();
 /* ---- install guide ---- */
 const YC_STANDALONE=(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||window.navigator.standalone===true;
 const YC_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);

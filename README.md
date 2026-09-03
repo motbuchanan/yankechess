@@ -1,11 +1,12 @@
-# Yanke Bionics Chess — v1.5 · Sep 3 2026
+# Yanke Bionics Chess — v1.6 · Sep 3 2026
 
 Standalone PWA. Upload every file in this folder to the ROOT of its own GitHub repo, enable Pages (main / root), open the Pages URL on a phone and "Add to Home Screen".
 
 Files:
 - index.html            the whole app (engine, coach, learn lessons, themes)
-- sw.js                 service worker (network-first, offline fallback). CACHE = yankechess-v1.5-sep3-2026
+- sw.js                 service worker (network-first, offline fallback). CACHE = yankechess-v1.6-sep3-2026
 - manifest.webmanifest  install metadata (name "Yanke Bionics Chess", short name "Yanke Chess")
+- mark.png              Vitruvian mark for the splash + icons
 - logo.png              real Yanke logo, near-black flattened to #000000, 1400px wide
 - icon192.png / icon512.png / iconmaskable512.png / favicon.png   Vitruvian mark cropped from the real logo on #000000
 
